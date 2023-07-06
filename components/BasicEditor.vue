@@ -362,6 +362,7 @@ watch(vModel, (newValue) => {
 
   &__header {
     @apply bg-gray-800 rounded-t-lg px-3 py-2 flex gap-1 items-center;
+    overflow-x: auto;
 
     &.is-hidden {
       visibility: hidden;
