@@ -1,4 +1,15 @@
 <template>
+  <p class="mb-2">
+    You can see all code in
+    <a
+      href="https://github.com/irsyaadbp/nuxt-tiptap"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="underline font-semibold"
+    >
+      this github
+    </a>
+  </p>
   <BasicEditor v-model="content" :upload-image-fn="onUploadImage" />
 </template>
 
