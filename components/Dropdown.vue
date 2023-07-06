@@ -35,10 +35,7 @@
     <Transition name="dropdown">
       <div
         v-if="openPopup"
-        class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-gray-700 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-        :class="{
-          'w-auto': orientation === 'horizontal',
-        }"
+        class="absolute right-0 z-10 mt-2 w-auto origin-top-right rounded-md bg-gray-700 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
         role="menu"
         :aria-orientation="orientation"
         aria-labelledby="menu-button"
@@ -114,7 +111,7 @@ const itemSelected = computed(
 
 function handleChoose(newValue: any) {
   vModel.value = newValue;
-  openPopup.value = false
+  openPopup.value = false;
 }
 </script>
 
