@@ -1,0 +1,33 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "devDependencies": {
+    "@egoist/tailwindcss-icons": "^1.1.0",
+    "@iconify/json": "^2.2.87",
+    "@nuxt/devtools": "latest",
+    "@nuxtjs/tailwindcss": "^6.8.0",
+    "@types/node": "^18",
+    "nuxt": "^3.6.2",
+    "sass": "^1.63.6"
+  },
+  "dependencies": {
+    "@privyid/persona-icon": "^0.16.0",
+    "@tiptap/extension-highlight": "^2.0.3",
+    "@tiptap/extension-image": "^2.0.3",
+    "@tiptap/extension-placeholder": "^2.0.3",
+    "@tiptap/extension-subscript": "^2.0.3",
+    "@tiptap/extension-superscript": "^2.0.3",
+    "@tiptap/extension-text-align": "^2.0.3",
+    "@tiptap/extension-underline": "^2.0.3",
+    "@tiptap/pm": "^2.0.3",
+    "@tiptap/starter-kit": "^2.0.3",
+    "@tiptap/vue-3": "^2.0.3"
+  }
+}
