@@ -18,7 +18,14 @@ definePageMeta({
   title: "Tiptap Editor",
 });
 
-const content = ref("");
+const content = ref(`<p>
+          This is still the text editor you’re used to, but enriched with node views.
+        </p>
+        <node-square>
+        </node-square>
+        <p>
+          Did you see that? That’s a Vue component. We are really living in the future.
+        </p>`);
 
 async function onUploadImage(source: File) {
   const formData = new FormData();

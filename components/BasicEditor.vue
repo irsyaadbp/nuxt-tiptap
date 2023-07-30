@@ -152,6 +152,8 @@ import IconTextRight from "~/components/icon/TextRight.vue";
 import IconTextCenter from "~/components/icon/TextCenter.vue";
 import IconTextJustify from "~/components/icon/TextJustify.vue";
 
+import NodeShape from "~/tiptap-plugins/NodeShape";
+
 const props = defineProps({
   modelValue: {
     type: String,
@@ -260,6 +262,7 @@ const editor = useEditor({
     Image.configure({
       inline: true,
     }),
+    NodeShape
   ],
   onUpdate: (value) => {
     // HTML
