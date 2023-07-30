@@ -1,5 +1,5 @@
 <template>
-  <node-view-wrapper>
+  <node-view-wrapper class="custom-shape" :style="{ width, height }">
     <div class="vue-component">
       <div
         class="drag-handle"
@@ -8,24 +8,78 @@
         data-drag-handle
       />
       <node-view-content class="content" />
+      <div className="resize-trigger" @mousedown="handler"><IconResize /></div>
     </div>
   </node-view-wrapper>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { NodeViewContent, nodeViewProps, NodeViewWrapper } from "@tiptap/vue-3";
 
-defineProps(nodeViewProps);
+const props = defineProps(nodeViewProps);
+
+const width = computed(() =>
+  typeof props.node.attrs.width === "number"
+    ? `${props.node.attrs.width}px`
+    : props.node.attrs.width
+);
+const height = computed(() =>
+  typeof props.node.attrs.height === "number"
+    ? `${props.node.attrs.height}px`
+    : props.node.attrs.height
+);
+
+function handler(mouseDownEvent: MouseEvent) {
+  const parent = (mouseDownEvent.target as HTMLElement).closest(
+    ".custom-shape"
+  );
+  const shape = parent?.querySelector("div.vue-component") ?? null;
+
+  if (shape === null) return;
+  const startSize = { x: shape.clientWidth, y: shape.clientHeight };
+  const startPosition = { x: mouseDownEvent.pageX, y: mouseDownEvent.pageY };
+
+  function onMouseMove(mouseMoveEvent: MouseEvent) {
+    props.updateAttributes({
+      width: startSize.x - startPosition.x + mouseMoveEvent.pageX,
+      height: startSize.y - startPosition.y + mouseMoveEvent.pageY,
+    });
+  }
+  function onMouseUp() {
+    document.body.removeEventListener("mousemove", onMouseMove);
+  }
+
+  document.body.addEventListener("mousemove", onMouseMove);
+  document.body.addEventListener("mouseup", onMouseUp, { once: true });
+}
+
+// function handleClick() {
+//   alert('dasdas');
+// }
 </script>
 
 <style lang="scss">
 .vue-component {
   position: relative;
   padding: 0.5rem;
-  width: 100px;
-  //   cursor: grab;
+  width: 100%;
+  height: 100%;
   background: #faf594;
   border-radius: 0.5rem;
+
+  .resize-trigger {
+    position: absolute;
+    right: -6px;
+    bottom: -9px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    color: #3259a5;
+    cursor: nwse-resize;
+    z-index: 200;
+  }
+  &:hover .resize-trigger {
+    opacity: 1;
+  }
 }
 .content {
   padding: 0.5rem;
