@@ -1,5 +1,8 @@
 <template>
-  <node-view-wrapper class="custom-shape" :style="{ width, height }">
+  <node-view-wrapper
+    class="custom-shape"
+    :style="{ ...props.node.attrs, width, height }"
+  >
     <div class="vue-component">
       <div
         class="drag-handle"

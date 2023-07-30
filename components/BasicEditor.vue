@@ -253,7 +253,7 @@ const editor = useEditor({
       },
     }),
     TextAlignment.configure({
-      types: ["heading", "paragraph"],
+      types: ["heading", "paragraph", "nodeSquare"],
     }),
     Underline,
     Subscript,
@@ -262,7 +262,7 @@ const editor = useEditor({
     Image.configure({
       inline: true,
     }),
-    NodeShape
+    NodeShape,
   ],
   onUpdate: (value) => {
     // HTML

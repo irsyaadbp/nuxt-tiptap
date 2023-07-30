@@ -40,7 +40,12 @@ export default Node.create({
   },
 
   renderHTML({ HTMLAttributes }) {
-    return ["node-square", mergeAttributes(HTMLAttributes), 0];
+    console.log(this.options.HTMLAttributes, HTMLAttributes);
+    return [
+      "node-square",
+      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+      0,
+    ];
   },
 
   addNodeView() {
