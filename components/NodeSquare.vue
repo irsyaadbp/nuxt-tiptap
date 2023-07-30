@@ -1,7 +1,7 @@
 <template>
   <node-view-wrapper
     class="custom-shape"
-    :style="{ ...props.node.attrs, width, height }"
+    :style="{ ...props.node.attrs, width, height, ...positionAttrs[position] }"
   >
     <div class="vue-component">
       <div
@@ -11,6 +11,29 @@
         data-drag-handle
       />
       <node-view-content class="content" />
+      <div class="position-handle">
+        <button
+          type="button"
+          @click="position = 'left'"
+          :class="{ 'bg-slate-200': position === 'left' }"
+        >
+          <small>Left</small>
+        </button>
+        <button
+          type="button"
+          :class="{ 'bg-slate-100': position === 'center' }"
+          @click="position = 'center'"
+        >
+          <small>Center</small>
+        </button>
+        <button
+          type="button"
+          :class="{ 'bg-slate-100': position === 'right' }"
+          @click="position = 'right'"
+        >
+          <small>Right</small>
+        </button>
+      </div>
       <div className="resize-trigger" @mousedown="handler"><IconResize /></div>
     </div>
   </node-view-wrapper>
@@ -18,8 +41,15 @@
 
 <script setup lang="ts">
 import { NodeViewContent, nodeViewProps, NodeViewWrapper } from "@tiptap/vue-3";
+type Position = "left" | "center" | "right";
+const positionAttrs: Record<Position, object> = {
+  left: {},
+  center: { margin: "0 auto" },
+  right: { "margin-left": "auto", "margin-right": 0 },
+};
 
 const props = defineProps(nodeViewProps);
+const position = ref<Position>("left");
 
 const width = computed(() =>
   typeof props.node.attrs.width === "number"
@@ -78,16 +108,34 @@ function handler(mouseDownEvent: MouseEvent) {
     transition: opacity 0.3s ease;
     color: #3259a5;
     cursor: nwse-resize;
-    z-index: 200;
   }
-  &:hover .resize-trigger {
-    opacity: 1;
+
+  .position-handle {
+    @apply shadow rounded;
+    @apply p-1;
+    @apply grid grid-cols-3 gap-1;
+
+    position: absolute;
+    bottom: -40px;
+    background-color: white;
+    width: 170px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    button {
+      @apply rounded;
+      text-align: center;
+    }
+  }
+
+  &:hover {
+    .resize-trigger,
+    .position-handle {
+      opacity: 1;
+    }
   }
 }
 .content {
   padding: 0.5rem;
-  //   border: 2px dashed #0d0d0d20;
-
   overflow-y: auto;
   border-radius: 0.5rem;
 }
