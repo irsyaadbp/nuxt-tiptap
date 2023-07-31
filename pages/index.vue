@@ -1,16 +1,14 @@
 <template>
-  <p class="mb-2">
-    You can see all code in
-    <a
-      href="https://github.com/irsyaadbp/nuxt-tiptap"
-      target="_blank"
-      rel="noopener noreferrer"
-      class="underline font-semibold"
-    >
-      this github
-    </a>
-  </p>
-  <BasicEditor v-model="content" :upload-image-fn="onUploadImage" />
+  <!-- <NgihuyEditor v-model="content" :upload-image-fn="onUploadImage" /> -->
+  <div v-for="(c, i) in content">
+    <NgihuyEditor
+      :id="`ngihuy-${i}`"
+      v-model="content[i]"
+      :upload-image-fn="onUploadImage"
+      :editor-index="i"
+      @set-active="onSetActive"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -18,14 +16,34 @@ definePageMeta({
   title: "Tiptap Editor",
 });
 
-const content = ref(`<p>
-          This is still the text editor you’re used to, but enriched with node views.
-        </p>
-        <node-square>
-        </node-square>
-        <p>
-          Did you see that? That’s a Vue component. We are really living in the future.
-        </p>`);
+const content = ref([""]);
+const editorActive = ref();
+
+watch(content.value, (newValue, oldValue) => {
+  const contentHeight =
+    document
+      .getElementById(`ngihuy-${editorActive.value}`)
+      ?.getElementsByClassName("ProseMirror")?.[0]?.clientHeight || 0;
+
+  // if contentHeight >= 1032px && editorActive is last of array index && click enter
+  if (
+    contentHeight >= 1032 &&
+    editorActive.value === content.value.length - 1
+  ) {
+    content.value.push("");
+    // set focus to the new editor
+    nextTick(() => {
+      const nextEditor = document
+        .getElementById(`ngihuy-${editorActive.value + 1}`)
+        ?.getElementsByClassName("ProseMirror")?.[0];
+      nextEditor?.focus();
+    });
+  }
+});
+
+function onSetActive(value: any) {
+  editorActive.value = value;
+}
 
 async function onUploadImage(source: File) {
   const formData = new FormData();
