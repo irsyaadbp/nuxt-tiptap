@@ -1,141 +1,12 @@
 <template>
-  <div class="editor_header" @click="handleFocus">
-    <!-- <div class="editor__header">
-      <template v-if="editor">
-        <dropdown
-          v-model="textLevelSelected"
-          :items="textLevel"
-          @update:model-value="handleChooseHead"
-        />
-
-        <dropdown
-          v-model="textAlign"
-          :items="textAlignment"
-          orientation="horizontal"
-          @update:model-value="handleChooseAlignment"
-        >
-          <template #selected="{ value }">
-            <component :is="iconAlignment[value]" />
-          </template>
-          <template #item="{ item }">
-            <component :is="iconAlignment[item.value]" />
-          </template>
-        </dropdown>
-
-        <button
-          class="editor__header-btn"
-          :class="{ 'is-active': editor.isActive('bold') }"
-          @click="editor.chain().focus().toggleBold().run()"
-        >
-          <icon-bold />
-        </button>
-        <button
-          class="editor__header-btn"
-          :class="{ 'is-active': editor.isActive('italic') }"
-          @click="editor.chain().focus().toggleItalic().run()"
-        >
-          <icon-italic />
-        </button>
-        <button
-          class="editor__header-btn"
-          :class="{ 'is-active': editor.isActive('subscript') }"
-          @click="editor.chain().focus().toggleSubscript().run()"
-        >
-          <icon-subscript />
-        </button>
-        <button
-          class="editor__header-btn"
-          :class="{ 'is-active': editor.isActive('superscript') }"
-          @click="editor.chain().focus().toggleSuperscript().run()"
-        >
-          <icon-superscript />
-        </button>
-
-        <button
-          class="editor__header-btn"
-          :class="{ 'is-active': editor.isActive('strike') }"
-          @click="editor.chain().focus().toggleStrike().run()"
-        >
-          <icon-strike />
-        </button>
-
-        <button
-          class="editor__header-btn"
-          :class="{ 'is-active': editor.isActive('underline') }"
-          @click="editor.chain().focus().toggleUnderline().run()"
-        >
-          <icon-underline />
-        </button>
-        <button
-          class="editor__header-btn"
-          :class="{
-            'is-active': editor.isActive('highlight'),
-          }"
-          @click="editor.chain().focus().toggleHighlight().run()"
-        >
-          <icon-highlight />
-        </button>
-
-        <button
-          class="editor__header-btn"
-          :class="{ 'is-active': editor.isActive('bulletList') }"
-          @click="editor.chain().focus().toggleBulletList().run()"
-        >
-          <icon-bullet-list />
-        </button>
-
-        <button
-          class="editor__header-btn"
-          :class="{ 'is-active': editor.isActive('orderedList') }"
-          @click="editor.chain().focus().toggleOrderedList().run()"
-        >
-          <icon-number-list />
-        </button>
-
-        <button
-          class="editor__header-btn"
-          :class="{ 'is-active': editor.isActive('blockquote') }"
-          @click="editor.chain().focus().toggleBlockquote().run()"
-        >
-          <icon-blockquote />
-        </button>
-        <button
-          class="editor__header-btn"
-          :class="{ 'is-active': editor.isActive('blockquote') }"
-          @click="handleUploadImage"
-        >
-          <icon-image />
-        </button>
-        <input
-          ref="inputImage"
-          type="file"
-          accept=".jpg,.jpeg,.png"
-          class="hidden"
-          @change="handleChangeImage"
-        />
-
-        <button
-          class="editor__header-btn"
-          @click="editor.chain().focus().undo().run()"
-        >
-          <icon-undo />
-        </button>
-
-        <button
-          class="editor__header-btn"
-          @click="editor.chain().focus().redo().run()"
-        >
-          <icon-redo />
-        </button>
-      </template>
-    </div> -->
-
-    <div>
-      <editor-content :editor="editor" />
+  <div class="relative flex-none">
+    <div class="editor_header" @click="handleFocus">
+      <div>
+        <editor-content :editor="editor" />
+      </div>
     </div>
-  </div>
-  <div class="relative">
-    <div id="show_header" class="editor_information">
+
+    <div ref="header" id="show_header" class="editor_information">
       <div>Header</div>
     </div>
   </div>
@@ -150,15 +21,9 @@ import Underline from "@tiptap/extension-underline";
 import Subscript from "@tiptap/extension-subscript";
 import Superscript from "@tiptap/extension-superscript";
 import Highlight from "@tiptap/extension-highlight";
-import Image from "@tiptap/extension-image";
+import BubbleMenu from "@tiptap/extension-bubble-menu";
 
-import IconTextLeft from "~/components/icon/TextLeft.vue";
-import IconTextRight from "~/components/icon/TextRight.vue";
-import IconTextCenter from "~/components/icon/TextCenter.vue";
-import IconTextJustify from "~/components/icon/TextJustify.vue";
-
-import NodeShape from "~/tiptap-plugins/NodeShape";
-
+import ImageResizeable from "~/tiptap-plugins/image/ImageResizeable";
 const props = defineProps({
   modelValue: {
     type: String,
@@ -173,11 +38,14 @@ const props = defineProps({
     default: 0,
   },
 });
-const emits = defineEmits(["update:modelValue", "setActive", "delete:editor"]);
 
-const textAlign = ref("left");
-const textLevelSelected = ref<number | "paragraph">("paragraph");
-const inputImage = ref<HTMLInputElement>();
+const header = ref<HTMLDivElement>();
+const emits = defineEmits([
+  "update:modelValue",
+  "setActive",
+  "delete:editor",
+  "focus:editor",
+]);
 
 const vModel = computed({
   get() {
@@ -205,22 +73,7 @@ const textAlignment = [
     value: "justify",
   },
 ];
-const iconAlignment: Record<any, any> = {
-  left: IconTextLeft,
-  right: IconTextRight,
-  center: IconTextCenter,
-  justify: IconTextJustify,
-};
-const textLevel = [
-  {
-    text: "Paragraph",
-    value: "paragraph",
-  },
-  ...Array.from({ length: 6 }, (_, i) => ({
-    text: `Heading ${i + 1}`,
-    value: i + 1,
-  })),
-];
+
 const defaultHeadingClass = "font-bold";
 const headingClass: Record<Level, string> = {
   1: "text-7xl",
@@ -268,51 +121,35 @@ const editor = useEditor({
     Subscript,
     Superscript,
     Highlight,
-    Image.configure({
+    ImageResizeable.configure({
       inline: true,
+      allowBase64: true,
     }),
-    NodeShape,
+    BubbleMenu
   ],
-  onFocus() {
+  onFocus({ editor }) {
     setFocusEditor();
+
+    emits("focus:editor", editor);
   },
   onBlur() {
     setBlurEditor();
   },
-  onTransaction(props) {
-    console.log(props.transaction);
-  },
+  onTransaction(props) {},
   onUpdate: ({ editor }) => {
-    if (editor.isEmpty && props.editorIndex > 0) {
-      emits("delete:editor", props.editorIndex);
-    }
     // HTML
     vModel.value = editor.getHTML();
-  },
-
-  onSelectionUpdate(event) {
-    if (event.editor?.isActive("heading")) {
-      [1, 2, 3, 4, 5, 6].forEach((level) => {
-        if (event.editor.isActive("heading", { level })) {
-          textLevelSelected.value = level;
-        }
-      });
-    } else {
-      textLevelSelected.value = "paragraph";
-    }
-
-    textAlignment.forEach((align) => {
-      if (event.editor.isActive({ textAlign: align.value })) {
-        textAlign.value = align.value;
-      }
-    });
   },
   editorProps: {
     attributes: {
       class:
-        "prose dark:prose-invert prose-sm sm:prose-base lg:prose-lg xl:prose-2xl focus:outline-none",
+        "prose dark:prose-invert prose-sm sm:prose-base lg:prose-lg xl:prose-2xl focus:outline-none max-h-[300px]",
     },
   },
+});
+
+defineExpose({
+  editor,
 });
 
 // If you use persona use this
@@ -327,58 +164,15 @@ const editor = useEditor({
 // };
 
 function setFocusEditor() {
-  const body = document.getElementById("show_header");
-  body!.classList.add("editor_information--show");
+  header.value!.classList.add("editor_information--show");
   emits("setActive", props.editorIndex);
   return true;
 }
 function setBlurEditor() {
-  const body = document.getElementById("show_header");
-  body!.classList.remove("editor_information--show");
+  header.value!.classList.remove("editor_information--show");
 }
 function handleFocus() {
   editor.value?.chain().focus("end");
-}
-
-function handleChooseHead(newValue: any) {
-  if (newValue === "paragraph") {
-    return editor.value?.chain().focus().setParagraph().run();
-  }
-  editor.value
-    ?.chain()
-    .focus()
-    .toggleHeading({ level: Number(newValue) as Level })
-    .run();
-}
-
-function handleChooseAlignment(newValue: string) {
-  editor.value?.chain().focus().setTextAlign(newValue).run();
-}
-function handleUploadImage() {
-  if (inputImage.value) {
-    inputImage.value?.click();
-  }
-}
-async function handleChangeImage(event: Event) {
-  const allowFiles = ["jpg", "jpeg", "png"];
-  const file = (event.target as HTMLInputElement).files?.[0];
-
-  if (confirm("Are you sure to upload this image?")) {
-    if (file) {
-      if (allowFiles.findIndex((type) => file.type.includes(type)) === -1) {
-        return alert(`File type ${file.type} not allowed, only ${allowFiles}`);
-      }
-
-      // TODO: change this to api return url image
-      const urlImage = props.uploadImageFn
-        ? await props.uploadImageFn(file)
-        : URL.createObjectURL(file);
-
-      if (urlImage) {
-        editor.value?.chain().setImage({ src: urlImage }).run();
-      }
-    }
-  }
 }
 
 watch(vModel, (newValue) => {
@@ -396,12 +190,12 @@ watch(vModel, (newValue) => {
 .editor {
   &_header {
     outline: none;
-    border-bottom: none;
     min-height: 97px;
 
     padding-top: 15px;
     padding-left: 20px;
     padding-right: 20px;
+    padding-bottom: 15px;
   }
   &_information {
     display: none;
@@ -418,3 +212,4 @@ watch(vModel, (newValue) => {
   }
 }
 </style>
+tiptap-plugins/image/ImageResizeable
