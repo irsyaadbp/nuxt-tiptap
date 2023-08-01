@@ -1,136 +1,11 @@
 <template>
-  <div class="editor" @click="handleFocus">
-    <div class="editor__header">
-      <template v-if="editor">
-        <dropdown
-          v-model="textLevelSelected"
-          :items="textLevel"
-          @update:model-value="handleChooseHead"
-        />
-
-        <dropdown
-          v-model="textAlign"
-          :items="textAlignment"
-          orientation="horizontal"
-          @update:model-value="handleChooseAlignment"
-        >
-          <template #selected="{ value }">
-            <component :is="iconAlignment[value]" />
-          </template>
-          <template #item="{ item }">
-            <component :is="iconAlignment[item.value]" />
-          </template>
-        </dropdown>
-
-        <button
-          class="editor__header-btn"
-          :class="{ 'is-active': editor.isActive('bold') }"
-          @click="editor.chain().focus().toggleBold().run()"
-        >
-          <icon-bold />
-        </button>
-        <button
-          class="editor__header-btn"
-          :class="{ 'is-active': editor.isActive('italic') }"
-          @click="editor.chain().focus().toggleItalic().run()"
-        >
-          <icon-italic />
-        </button>
-        <button
-          class="editor__header-btn"
-          :class="{ 'is-active': editor.isActive('subscript') }"
-          @click="editor.chain().focus().toggleSubscript().run()"
-        >
-          <icon-subscript />
-        </button>
-        <button
-          class="editor__header-btn"
-          :class="{ 'is-active': editor.isActive('superscript') }"
-          @click="editor.chain().focus().toggleSuperscript().run()"
-        >
-          <icon-superscript />
-        </button>
-
-        <button
-          class="editor__header-btn"
-          :class="{ 'is-active': editor.isActive('strike') }"
-          @click="editor.chain().focus().toggleStrike().run()"
-        >
-          <icon-strike />
-        </button>
-
-        <button
-          class="editor__header-btn"
-          :class="{ 'is-active': editor.isActive('underline') }"
-          @click="editor.chain().focus().toggleUnderline().run()"
-        >
-          <icon-underline />
-        </button>
-        <button
-          class="editor__header-btn"
-          :class="{
-            'is-active': editor.isActive('highlight'),
-          }"
-          @click="editor.chain().focus().toggleHighlight().run()"
-        >
-          <icon-highlight />
-        </button>
-
-        <button
-          class="editor__header-btn"
-          :class="{ 'is-active': editor.isActive('bulletList') }"
-          @click="editor.chain().focus().toggleBulletList().run()"
-        >
-          <icon-bullet-list />
-        </button>
-
-        <button
-          class="editor__header-btn"
-          :class="{ 'is-active': editor.isActive('orderedList') }"
-          @click="editor.chain().focus().toggleOrderedList().run()"
-        >
-          <icon-number-list />
-        </button>
-
-        <button
-          class="editor__header-btn"
-          :class="{ 'is-active': editor.isActive('blockquote') }"
-          @click="editor.chain().focus().toggleBlockquote().run()"
-        >
-          <icon-blockquote />
-        </button>
-        <button
-          class="editor__header-btn"
-          :class="{ 'is-active': editor.isActive('blockquote') }"
-          @click="handleUploadImage"
-        >
-          <icon-image />
-        </button>
-        <input
-          ref="inputImage"
-          type="file"
-          accept=".jpg,.jpeg,.png"
-          class="hidden"
-          @change="handleChangeImage"
-        />
-
-        <button
-          class="editor__header-btn"
-          @click="editor.chain().focus().undo().run()"
-        >
-          <icon-undo />
-        </button>
-
-        <button
-          class="editor__header-btn"
-          @click="editor.chain().focus().redo().run()"
-        >
-          <icon-redo />
-        </button>
-      </template>
+  <div class="relative">
+    <div id="show_footer" class="editor_information">
+      <div>Footer</div>
     </div>
-
-    <div class="editor__content">
+  </div>
+  <div class="editor_header" @click="handleFocus">
+    <div>
       <editor-content :editor="editor" />
     </div>
   </div>
@@ -271,6 +146,9 @@ const editor = useEditor({
   onFocus() {
     setFocusEditor();
   },
+  onBlur() {
+    setBlurEditor();
+  },
   onTransaction(props) {
     console.log(props.transaction);
   },
@@ -319,7 +197,14 @@ const editor = useEditor({
 // };
 
 function setFocusEditor() {
+  const body = document.getElementById("show_footer");
+  body!.classList.add("editor_information--show");
   emits("setActive", props.editorIndex);
+  return true;
+}
+function setBlurEditor() {
+  const body = document.getElementById("show_footer");
+  body!.classList.remove("editor_information--show");
 }
 function handleFocus() {
   editor.value?.chain().focus("end");
@@ -379,62 +264,28 @@ watch(vModel, (newValue) => {
 
 <style lang="scss" scoped>
 .editor {
-  padding-left: 20px;
-  padding-right: 20px;
-  width: 816px;
-  height: 306px;
+  &_header {
+    outline: none;
+    border-bottom: none;
+    min-height: 97px;
 
-  border-top: none;
-  // margin: 2px;
-
-  &__content {
-    @apply border-4 border-gray-800 rounded-b-lg;
-    border: 0;
-    border-radius: 0;
+    padding-top: 15px;
+    padding-left: 20px;
+    padding-right: 20px;
   }
-
-  &__header {
-    @apply bg-gray-800 rounded-t-lg px-3 py-2 flex gap-1 items-center;
+  &_information {
     display: none;
-
-    &.is-hidden {
-      visibility: hidden;
-      opacity: 0;
-    }
-
-    &.is-focused {
-      visibility: visible;
-      opacity: 1;
-      transition: visibility 0.2s, opacity 0.2s;
-    }
-
-    &-btn {
-      @apply text-white;
-      vertical-align: middle;
-
-      font-weight: bold;
-      display: inline-flex;
-      background: transparent;
-      border: 0;
-
-      padding: 6px;
-
-      border-radius: 3px;
-      cursor: pointer;
-
-      svg {
-        width: 16px;
-        height: 16px;
-      }
-
-      &:hover {
-        @apply bg-gray-700;
-      }
-
-      &.is-active {
-        @apply bg-gray-700;
-      }
-    }
+  }
+  &_information--show {
+    @apply border-t-2 border-b-2 border-gray-500;
+    position: absolute;
+    z-index: 2;
+    width: 100%;
+    display: block;
+    background-color: #f8f9fa;
+    padding: 10px;
+    font-weight: 500;
+    top: -80px;
   }
 }
 </style>

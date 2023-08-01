@@ -1,5 +1,6 @@
 <template>
-  <div v-for="(c, i) in content">
+  <div v-for="(c, i) in content" class="editor_container">
+    <Header v-model="contentHeader" :upload-image-fn="onUploadImage" />
     <NgihuyEditor
       :id="`ngihuy-${i}`"
       v-model="content[i]"
@@ -8,6 +9,7 @@
       @delete:editor="onDeleteIndex"
       @set-active="onSetActive"
     />
+    <Footer v-model="contentFooter" :upload-image-fn="onUploadImage" />
   </div>
   <!-- <BasicEditor v-model="content2" :upload-image-fn="onUploadImage" /> -->
 </template>
@@ -18,8 +20,19 @@ definePageMeta({
 });
 
 const content = ref([""]);
+const contentHeader = ref("");
+const contentFooter = ref("");
 
 const editorActive = ref();
+
+onMounted(() => {
+  nextTick(() => {
+    const nextEditor = document
+      .getElementById(`ngihuy-${content.value.length - 1}`)
+      ?.getElementsByClassName("ProseMirror")?.[0];
+    nextEditor?.focus();
+  });
+});
 
 watch(content.value, (newValue, oldValue) => {
   const contentHeight =
@@ -69,4 +82,10 @@ async function onUploadImage(source: File) {
 }
 </script>
 
-<style scoped></style>
+<style lang="scss" scoped>
+.editor_container {
+  width: 816px;
+  margin: 40px auto;
+  outline: 1px solid #c7c7c7;
+}
+</style>
