@@ -35,7 +35,7 @@ watch(content.value, (newValue, oldValue) => {
     content.value.push("");
     // set focus to the new editor
     nextTick(() => {
-      const nextEditor = document
+      const nextEditor: any = document
         .getElementById(`ngihuy-${editorActive.value + 1}`)
         ?.getElementsByClassName("ProseMirror")?.[0];
       nextEditor?.focus();
@@ -46,6 +46,12 @@ watch(content.value, (newValue, oldValue) => {
 function onDeleteIndex(index: number) {
   nextTick(() => {
     content.value.splice(index, 1);
+    nextTick(() => {
+      const prevEditor: any = document
+        .getElementById(`ngihuy-${editorActive.value - 1}`)
+        ?.getElementsByClassName("ProseMirror")?.[0];
+      prevEditor?.focus();
+    });
   });
 }
 
