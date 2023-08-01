@@ -35,6 +35,7 @@
     <Transition name="dropdown">
       <div
         v-if="openPopup"
+        ref="dropdownItemRef"
         class="absolute right-0 z-10 mt-2 w-auto origin-top-right rounded-md bg-gray-700 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
         role="menu"
         :aria-orientation="orientation"
@@ -95,6 +96,7 @@ const props = defineProps({
     default: "vertical",
   },
 });
+
 const emits = defineEmits(["update:modelValue"]);
 const vModel = computed({
   get() {
@@ -105,10 +107,14 @@ const vModel = computed({
   },
 });
 const openPopup = ref(false);
+const dropdownItemRef = ref();
 const itemSelected = computed(
   () => props.items.find((item) => item.value === vModel.value) || undefined
 );
 
+onClickOutside(dropdownItemRef, () => {
+  openPopup.value = false;
+});
 function handleChoose(newValue: any) {
   vModel.value = newValue;
   openPopup.value = false;
