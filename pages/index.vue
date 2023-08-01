@@ -1,14 +1,15 @@
 <template>
-  <!-- <NgihuyEditor v-model="content" :upload-image-fn="onUploadImage" /> -->
   <div v-for="(c, i) in content">
     <NgihuyEditor
       :id="`ngihuy-${i}`"
       v-model="content[i]"
       :upload-image-fn="onUploadImage"
       :editor-index="i"
+      @delete:editor="onDeleteIndex"
       @set-active="onSetActive"
     />
   </div>
+  <!-- <BasicEditor v-model="content2" :upload-image-fn="onUploadImage" /> -->
 </template>
 
 <script setup lang="ts">
@@ -17,6 +18,7 @@ definePageMeta({
 });
 
 const content = ref([""]);
+
 const editorActive = ref();
 
 watch(content.value, (newValue, oldValue) => {
@@ -40,6 +42,12 @@ watch(content.value, (newValue, oldValue) => {
     });
   }
 });
+
+function onDeleteIndex(index: number) {
+  nextTick(() => {
+    content.value.splice(index, 1);
+  });
+}
 
 function onSetActive(value: any) {
   editorActive.value = value;

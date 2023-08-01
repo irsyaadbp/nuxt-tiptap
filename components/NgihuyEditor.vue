@@ -1,5 +1,5 @@
 <template>
-  <div class="editor">
+  <div class="editor" @click="handleFocus">
     <div class="editor__header">
       <template v-if="editor">
         <dropdown
@@ -130,7 +130,7 @@
       </template>
     </div>
 
-    <div class="editor__content" @focusin="handleFocus">
+    <div class="editor__content">
       <editor-content :editor="editor" />
     </div>
   </div>
@@ -165,9 +165,10 @@ const props = defineProps({
   },
   editorIndex: {
     type: Number,
+    default: 0,
   },
 });
-const emits = defineEmits(["update:modelValue", "setActive"]);
+const emits = defineEmits(["update:modelValue", "setActive", "delete:editor"]);
 
 const textAlign = ref("left");
 const textLevelSelected = ref<number | "paragraph">("paragraph");
@@ -267,10 +268,20 @@ const editor = useEditor({
     }),
     NodeShape,
   ],
-  onUpdate: (value) => {
-    // HTML
-    vModel.value = value.editor.getHTML();
+  onFocus() {
+    setFocusEditor();
   },
+  onTransaction(props) {
+    console.log(props.transaction);
+  },
+  onUpdate: ({ editor }) => {
+    if (editor.isEmpty && props.editorIndex > 0) {
+      emits("delete:editor", props.editorIndex);
+    }
+    // HTML
+    vModel.value = editor.getHTML();
+  },
+
   onSelectionUpdate(event) {
     if (event.editor?.isActive("heading")) {
       [1, 2, 3, 4, 5, 6].forEach((level) => {
@@ -307,8 +318,11 @@ const editor = useEditor({
 //   6: "h6",
 // };
 
-function handleFocus() {
+function setFocusEditor() {
   emits("setActive", props.editorIndex);
+}
+function handleFocus() {
+  editor.value?.chain().focus("end");
 }
 
 function handleChooseHead(newValue: any) {
