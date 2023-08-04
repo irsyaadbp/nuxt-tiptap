@@ -16,7 +16,6 @@
       <PaginationEditor ref="tiptap" v-model="content" />
     </div>
   </div>
-  {{ content }}
 </template>
 
 <script setup lang="ts">
