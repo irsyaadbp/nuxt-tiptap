@@ -29,6 +29,7 @@
     "@tiptap/extension-underline": "^2.0.3",
     "@tiptap/pm": "^2.0.3",
     "@tiptap/starter-kit": "^2.0.3",
-    "@tiptap/vue-3": "^2.0.3"
+    "@tiptap/vue-3": "^2.0.3",
+    "mammoth": "^1.6.0"
   }
 }
