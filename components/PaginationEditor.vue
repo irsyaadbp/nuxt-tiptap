@@ -201,7 +201,8 @@ watch(
       const currentPageCount = separatePage.length;
 
       if (shouldAddPageBreak(currentPageCount, editorContainer)) {
-        newValue = oldValue + PAGE_BREAK_FORMAT;
+        newValue = (newValue || "").replace(/<p><\/p>(?![\s\S]*<p><\/p>)/, "");
+        newValue += PAGE_BREAK_FORMAT;
 
         editor.value?.commands.setContent(newValue || "", true);
         return;
@@ -224,7 +225,7 @@ watch(
           .join(PAGE_BREAK_FORMAT_CHECK);
 
         if (
-          newValue?.includes(PAGE_BREAK_FORMAT_CHECK) &&
+          newValue?.includes(PAGE_BREAK_FORMAT) &&
           separatePage[currentPageCount - 1] !== ""
         )
           return;
@@ -235,26 +236,6 @@ watch(
         });
       }
     }
-
-    // } else {
-    //   const oldContent = oldValue || "";
-    //   const currentPageCount = oldContent.split(PAGE_BREAK_FORMAT).length;
-    //   const nextPageContent = oldContent.split(PAGE_BREAK_FORMAT)[1];
-    //   //   console.log(
-    //   //     nextPageContent,
-    //   //     oldContent.split(PAGE_BREAK_FORMAT),
-    //   //     currentPageCount
-    //   //   );
-    //   //   if (!nextPageContent) {
-    //   //     newValue = oldContent.replace(PAGE_BREAK_FORMAT, "");
-
-    //   //     editor.value?.commands.setContent(newValue || "", true);
-
-    //   //     nextTick(() => {
-    //   //       editor.value?.chain().focus("end");
-    //   //     });
-    //   //   }
-    // }
   },
   { deep: true }
 );
