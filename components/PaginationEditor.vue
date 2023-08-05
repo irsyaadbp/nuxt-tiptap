@@ -16,6 +16,7 @@ import Highlight from "@tiptap/extension-highlight";
 import Image from "@tiptap/extension-image";
 import { Node } from "@tiptap/core";
 import { PAGE_BREAK_FORMAT, PAPER_HEIGHT, SPARATOR_HEIGHT } from "~/constants";
+import { PAGE_BREAK_FORMAT_CHECK } from "~/constants";
 
 const PageBreak = Node.create({
   name: "pageBreak",
@@ -190,37 +191,102 @@ defineExpose({
 watch(
   vModel,
   (newValue, oldValue) => {
-    if (shouldAddPageBreak(newValue as string, oldValue as string)) {
-      newValue = oldValue + PAGE_BREAK_FORMAT;
+    const editorContainer = document.querySelector(
+      ".page--placeholder"
+    ) as HTMLDivElement;
 
-      editor.value?.commands.setContent(newValue || "", true);
+    if (editorContainer) {
+      // const
+      const separatePage = (newValue as string).split(PAGE_BREAK_FORMAT_CHECK);
+      const currentPageCount = separatePage.length;
 
-      nextTick(() => {
-        editor.value?.chain().focus("end");
-      });
+      if (shouldAddPageBreak(currentPageCount, editorContainer)) {
+        newValue = oldValue + PAGE_BREAK_FORMAT;
+
+        editor.value?.commands.setContent(newValue || "", true);
+        return;
+      }
+
+      if (
+        shouldDeletePageBreak(
+          separatePage[currentPageCount - 1],
+          currentPageCount
+        )
+      ) {
+        const indexEmpty = separatePage.findIndex(
+          (item) => item === "" || item === "<p></p>"
+        );
+
+        if (indexEmpty < 1) return;
+
+        const _newValue = separatePage
+          .filter((_item, idx) => idx !== indexEmpty)
+          .join(PAGE_BREAK_FORMAT_CHECK);
+
+        if (
+          newValue?.includes(PAGE_BREAK_FORMAT_CHECK) &&
+          separatePage[currentPageCount - 1] !== ""
+        )
+          return;
+
+        editor.value?.commands.setContent(_newValue || "", true);
+        nextTick(() => {
+          editor.value?.chain().focus("end");
+        });
+      }
     }
+
+    // } else {
+    //   const oldContent = oldValue || "";
+    //   const currentPageCount = oldContent.split(PAGE_BREAK_FORMAT).length;
+    //   const nextPageContent = oldContent.split(PAGE_BREAK_FORMAT)[1];
+    //   //   console.log(
+    //   //     nextPageContent,
+    //   //     oldContent.split(PAGE_BREAK_FORMAT),
+    //   //     currentPageCount
+    //   //   );
+    //   //   if (!nextPageContent) {
+    //   //     newValue = oldContent.replace(PAGE_BREAK_FORMAT, "");
+
+    //   //     editor.value?.commands.setContent(newValue || "", true);
+
+    //   //     nextTick(() => {
+    //   //       editor.value?.chain().focus("end");
+    //   //     });
+    //   //   }
+    // }
   },
   { deep: true }
 );
 
-const shouldAddPageBreak = (currentValue: string, oldValue: string) => {
+const shouldAddPageBreak = (
+  currentPageCount: number,
+  editorContainer: HTMLDivElement
+) => {
   // Logika Anda untuk menentukan kapan harus menambahkan elemen page break
   // Misalnya, jika tinggi konten melebihi batas tertentu, Anda bisa menambahkan halaman baru.
-  const editorContainer = document.querySelector(".page--placeholder");
 
-  if (editorContainer) {
-    // const
-    const currentPageCount = currentValue.split(PAGE_BREAK_FORMAT).length;
+  const maxEditorHeight =
+    PAPER_HEIGHT + (currentPageCount - 1) * (PAPER_HEIGHT + SPARATOR_HEIGHT); // Batas tinggi konten editor
 
-    const maxEditorHeight =
-      PAPER_HEIGHT + (currentPageCount - 1) * (PAPER_HEIGHT + SPARATOR_HEIGHT); // Batas tinggi konten editor
+  const hasRoomForNextPage = editorContainer.clientHeight > maxEditorHeight;
 
-    const hasRoomForNextPage = editorContainer.clientHeight > maxEditorHeight;
-
-    return hasRoomForNextPage;
-  }
-  return false;
+  return hasRoomForNextPage;
 };
+
+function shouldDeletePageBreak(content: string, page: number) {
+  //   console.log(page > 1, isPageEmpty(content));
+  return page > 1 && (content === "" || content === "<p></p>");
+}
+
+function isPageEmpty(content: string) {
+  const condition = ["", "<p></p>"];
+
+  return !!condition.find((cond) => {
+    console.log({ cond, content, res: cond === content });
+    return cond === content;
+  });
+}
 </script>
 
 <style lang="scss">
