@@ -1,7 +1,7 @@
 <template>
-  <div v-html="test"></div>
+  <!-- <div v-html="test"></div> -->
   <div class="page--placeholder">
-    <editor-content :editor="editor" @paste.prevent="handlePaste" />
+    <editor-content :editor="editor" />
   </div>
 </template>
 
@@ -29,7 +29,7 @@ import {
 } from "~/constants";
 
 const test = ref("");
-const isOnpaste = ref(false);
+
 const PageBreak = Node.create({
   name: "pageBreak",
   addOptions() {
@@ -56,136 +56,28 @@ const PageBreak = Node.create({
     return ["div", mergeAttributes(HTMLAttributes)];
   },
 });
-const CustomTableCell = TableCell.extend({
+
+function getValueStyle(element, name: string) {
+  const style: string[] = element.getAttribute("style").split(";");
+  const findName = style.find((item) => item.includes(name));
+
+  return findName?.split(":")[1] || "";
+}
+
+const customAttribute: Record<any, any> = {
   addAttributes() {
     return {
       // extend the existing attributes …
-      ...this.parent?.(),
+      ...this?.parent?.(),
 
       borderBottom: {
         default: "",
-        renderHTML: (attributes) => {
-          if ([undefined, null, ""].includes(attributes.borderBottom))
-            return {};
-          console.log("asdad");
-          return {
-            style: `border-bottom: ${attributes.borderBottom}`,
-          };
+        parseHTML: (element) => {
+          return (
+            element.style.borderBottom ||
+            getValueStyle(element, "border-bottom")
+          );
         },
-      },
-      borderLeft: {
-        default: "",
-        renderHTML: (attributes) => {
-          if ([undefined, null, ""].includes(attributes.borderLeft)) return {};
-          return {
-            style: `border-left: ${attributes.borderLeft}`,
-          };
-        },
-      },
-      borderRight: {
-        default: "",
-        renderHTML: (attributes) => {
-          if ([undefined, null, ""].includes(attributes.borderRight)) return {};
-          return {
-            style: `border-right: ${attributes.borderRight}`,
-          };
-        },
-      },
-      borderTop: {
-        default: "",
-        renderHTML: (attributes) => {
-          if ([undefined, null, ""].includes(attributes.borderTop)) return {};
-          return {
-            style: `border-top: ${attributes.borderTop}`,
-          };
-        },
-      },
-      border: {
-        default: "",
-        renderHTML: (attributes) => {
-          if ([undefined, null, ""].includes(attributes.border)) return {};
-          return {
-            style: `border: ${attributes.border}`,
-          };
-        },
-      },
-      verticalAlign: {
-        default: "",
-        renderHTML: (attributes) => {
-          if ([undefined, null, ""].includes(attributes.verticalAlign))
-            return {};
-          return {
-            style: `vertical-align: ${attributes.verticalAlign}`,
-          };
-        },
-      },
-      padding: {
-        default: "",
-        renderHTML: (attributes) => {
-          if ([undefined, null, ""].includes(attributes.padding)) return {};
-          return {
-            style: `padding: ${attributes.padding}`,
-          };
-        },
-      },
-      paddingTop: {
-        default: "",
-        renderHTML: (attributes) => {
-          if ([undefined, null, ""].includes(attributes.paddingTop)) return {};
-          return {
-            style: `padding-top: ${attributes.paddingTop}`,
-          };
-        },
-      },
-      paddingLeft: {
-        default: "",
-        renderHTML: (attributes) => {
-          if ([undefined, null, ""].includes(attributes.paddingLeft)) return {};
-          return {
-            style: `padding-left: ${attributes.paddingLeft}`,
-          };
-        },
-      },
-      paddingBottom: {
-        default: "",
-        renderHTML: (attributes) => {
-          if ([undefined, null, ""].includes(attributes.paddingBottom))
-            return {};
-          return {
-            style: `padding-bottom: ${attributes.paddingBottom}`,
-          };
-        },
-      },
-      overflow: {
-        default: "",
-        renderHTML: (attributes) => {
-          if ([undefined, null, ""].includes(attributes.overflow)) return {};
-          return {
-            style: `overflow: ${attributes.overflow}`,
-          };
-        },
-      },
-      overflowWrap: {
-        default: "",
-        renderHTML: (attributes) => {
-          if ([undefined, null, ""].includes(attributes.overflowWrap))
-            return {};
-          return {
-            style: `overflow-wrap: ${attributes.overflowWrap}`,
-          };
-        },
-      },
-    };
-  },
-});
-const CustomTableRow = TableRow.extend({
-  addAttributes() {
-    return {
-      // extend the existing attributes …
-      ...this.parent?.(),
-
-      borderBottom: {
-        default: "",
         renderHTML: (attributes) => {
           if ([undefined, null, ""].includes(attributes.borderBottom))
             return {};
@@ -196,6 +88,8 @@ const CustomTableRow = TableRow.extend({
       },
       borderLeft: {
         default: "",
+        parseHTML: (element) =>
+          element.style.borderLeft || getValueStyle(element, "border-left"),
         renderHTML: (attributes) => {
           if ([undefined, null, ""].includes(attributes.borderLeft)) return {};
           return {
@@ -205,6 +99,8 @@ const CustomTableRow = TableRow.extend({
       },
       borderRight: {
         default: "",
+        parseHTML: (element) =>
+          element.style.borderRight || getValueStyle(element, "border-right"),
         renderHTML: (attributes) => {
           if ([undefined, null, ""].includes(attributes.borderRight)) return {};
           return {
@@ -214,6 +110,8 @@ const CustomTableRow = TableRow.extend({
       },
       borderTop: {
         default: "",
+        parseHTML: (element) =>
+          element.style.borderTop || getValueStyle(element, "border-top"),
         renderHTML: (attributes) => {
           if ([undefined, null, ""].includes(attributes.borderTop)) return {};
           return {
@@ -223,6 +121,8 @@ const CustomTableRow = TableRow.extend({
       },
       border: {
         default: "",
+        parseHTML: (element) =>
+          element.style.border || getValueStyle(element, "border-border"),
         renderHTML: (attributes) => {
           if ([undefined, null, ""].includes(attributes.border)) return {};
           return {
@@ -232,6 +132,9 @@ const CustomTableRow = TableRow.extend({
       },
       verticalAlign: {
         default: "",
+        parseHTML: (element) =>
+          element.style.verticalAlign ||
+          getValueStyle(element, "vertical-align"),
         renderHTML: (attributes) => {
           if ([undefined, null, ""].includes(attributes.verticalAlign))
             return {};
@@ -242,6 +145,8 @@ const CustomTableRow = TableRow.extend({
       },
       padding: {
         default: "",
+        parseHTML: (element) =>
+          element.style.padding || getValueStyle(element, "padding"),
         renderHTML: (attributes) => {
           if ([undefined, null, ""].includes(attributes.padding)) return {};
           return {
@@ -251,6 +156,8 @@ const CustomTableRow = TableRow.extend({
       },
       paddingTop: {
         default: "",
+        parseHTML: (element) =>
+          element.style.paddingTop || getValueStyle(element, "padding-top"),
         renderHTML: (attributes) => {
           if ([undefined, null, ""].includes(attributes.paddingTop)) return {};
           return {
@@ -260,6 +167,8 @@ const CustomTableRow = TableRow.extend({
       },
       paddingLeft: {
         default: "",
+        parseHTML: (element) =>
+          element.style.paddingLeft || getValueStyle(element, "padding-left"),
         renderHTML: (attributes) => {
           if ([undefined, null, ""].includes(attributes.paddingLeft)) return {};
           return {
@@ -269,6 +178,9 @@ const CustomTableRow = TableRow.extend({
       },
       paddingBottom: {
         default: "",
+        parseHTML: (element) =>
+          element.style.paddingBottom ||
+          getValueStyle(element, "padding-bottom"),
         renderHTML: (attributes) => {
           if ([undefined, null, ""].includes(attributes.paddingBottom))
             return {};
@@ -279,6 +191,8 @@ const CustomTableRow = TableRow.extend({
       },
       overflow: {
         default: "",
+        parseHTML: (element) =>
+          element.style.overflow || getValueStyle(element, "overflow"),
         renderHTML: (attributes) => {
           if ([undefined, null, ""].includes(attributes.overflow)) return {};
           return {
@@ -288,6 +202,8 @@ const CustomTableRow = TableRow.extend({
       },
       overflowWrap: {
         default: "",
+        parseHTML: (element) =>
+          element.style.overflowWrap || getValueStyle(element, "overflow-wrap"),
         renderHTML: (attributes) => {
           if ([undefined, null, ""].includes(attributes.overflowWrap))
             return {};
@@ -296,146 +212,38 @@ const CustomTableRow = TableRow.extend({
           };
         },
       },
+      height: {
+        default: "",
+        parseHTML: (element) =>
+          element.style.height || getValueStyle(element, "height"),
+        renderHTML: (attributes) => {
+          if ([undefined, null, ""].includes(attributes.height)) return {};
+          return {
+            style: `height: ${attributes.height}`,
+          };
+        },
+      },
+      borderCollapse: {
+        default: "",
+        parseHTML: (element) =>
+          element.style.borderCollapse ||
+          getValueStyle(element, "border-collapse"),
+        renderHTML: (attributes) => {
+          if ([undefined, null, ""].includes(attributes.borderCollapse))
+            return {};
+          return {
+            style: `border-collapse: ${attributes.borderCollapse}`,
+          };
+        },
+      },
     };
   },
-});
-const CustomTableHeader = TableHeader.extend({
-  addAttributes() {
-    return {
-      // extend the existing attributes …
-      ...this.parent?.(),
+};
 
-      // and add a new one …
-      // backgroundColor: {
-      //   default: null,
-      //   // parseHTML: (element) => element.getAttribute("data-background-color"),
-      //   renderHTML: (attributes) => {
-      //     return {
-      //       "data-background-color": attributes.backgroundColor,
-      //       style: `background-color: ${attributes.backgroundColor}`,
-      //     };
-      //   },
-      // },
-      // border-bottom: solid #000000 0.5pt;
-      // vertical-align: bottom;
-      // padding: 0pt 5.4pt 0pt 5.4pt;
-      // overflow: hidden;
-      // overflow-wrap: break-word;
-      borderBottom: {
-        default: "",
-        renderHTML: (attributes) => {
-          if ([undefined, null, ""].includes(attributes.borderBottom))
-            return {};
-          return {
-            style: `border-bottom: ${attributes.borderBottom}`,
-          };
-        },
-      },
-      borderLeft: {
-        default: "",
-        renderHTML: (attributes) => {
-          if ([undefined, null, ""].includes(attributes.borderLeft)) return {};
-          return {
-            style: `border-left: ${attributes.borderLeft}`,
-          };
-        },
-      },
-      borderRight: {
-        default: "",
-        renderHTML: (attributes) => {
-          if ([undefined, null, ""].includes(attributes.borderRight)) return {};
-          return {
-            style: `border-right: ${attributes.borderRight}`,
-          };
-        },
-      },
-      borderTop: {
-        default: "",
-        renderHTML: (attributes) => {
-          if ([undefined, null, ""].includes(attributes.borderTop)) return {};
-          return {
-            style: `border-top: ${attributes.borderTop}`,
-          };
-        },
-      },
-      border: {
-        default: "",
-        renderHTML: (attributes) => {
-          if ([undefined, null, ""].includes(attributes.border)) return {};
-          return {
-            style: `border: ${attributes.border}`,
-          };
-        },
-      },
-      verticalAlign: {
-        default: "",
-        renderHTML: (attributes) => {
-          if ([undefined, null, ""].includes(attributes.verticalAlign))
-            return {};
-          return {
-            style: `vertical-align: ${attributes.verticalAlign}`,
-          };
-        },
-      },
-      padding: {
-        default: "",
-        renderHTML: (attributes) => {
-          if ([undefined, null, ""].includes(attributes.padding)) return {};
-          return {
-            style: `padding: ${attributes.padding}`,
-          };
-        },
-      },
-      paddingTop: {
-        default: "",
-        renderHTML: (attributes) => {
-          if ([undefined, null, ""].includes(attributes.paddingTop)) return {};
-          return {
-            style: `padding-top: ${attributes.paddingTop}`,
-          };
-        },
-      },
-      paddingLeft: {
-        default: "",
-        renderHTML: (attributes) => {
-          if ([undefined, null, ""].includes(attributes.paddingLeft)) return {};
-          return {
-            style: `padding-left: ${attributes.paddingLeft}`,
-          };
-        },
-      },
-      paddingBottom: {
-        default: "",
-        renderHTML: (attributes) => {
-          if ([undefined, null, ""].includes(attributes.paddingBottom))
-            return {};
-          return {
-            style: `padding-bottom: ${attributes.paddingBottom}`,
-          };
-        },
-      },
-      overflow: {
-        default: "",
-        renderHTML: (attributes) => {
-          if ([undefined, null, ""].includes(attributes.overflow)) return {};
-          return {
-            style: `overflow: ${attributes.overflow}`,
-          };
-        },
-      },
-      overflowWrap: {
-        default: "",
-        renderHTML: (attributes) => {
-          if ([undefined, null, ""].includes(attributes.overflowWrap))
-            return {};
-          return {
-            style: `overflow-wrap: ${attributes.overflowWrap}`,
-          };
-        },
-      },
-    };
-  },
-});
+const CustomTable = Table.extend(customAttribute);
+const CustomTableCell = TableCell.extend(customAttribute);
+const CustomTableRow = TableRow.extend(customAttribute);
+const CustomTableHeader = TableHeader.extend(customAttribute);
 
 const props = defineProps({
   modelValue: {
@@ -530,8 +338,8 @@ const editor = useEditor({
       inline: true,
     }),
     PageBreak,
-    Table.configure({
-      resizable: true,
+    CustomTable.configure({
+      resizable: false,
     }),
     CustomTableRow,
     CustomTableHeader,
@@ -540,6 +348,7 @@ const editor = useEditor({
   ],
   onUpdate(props) {
     // HTML
+    console.log("update");
     vModel.value = props.editor.getHTML();
   },
   onSelectionUpdate(event) {
@@ -586,7 +395,6 @@ defineExpose({
 watch(
   vModel,
   (newValue, oldValue) => {
-    if (isOnpaste.value) return;
     const editorContainer = document.querySelector(
       ".page--placeholder"
     ) as HTMLDivElement;
@@ -599,7 +407,7 @@ watch(
       if (shouldAddPageBreak(currentPageCount, editorContainer)) {
         newValue = (newValue || "").replace(/<p><\/p>(?![\s\S]*<p><\/p>)/, "");
         newValue += PAGE_BREAK_FORMAT;
-        console.log("add page break");
+
         editor.value?.commands.setContent(newValue || "", true);
         return;
       }
@@ -610,7 +418,6 @@ watch(
           currentPageCount
         )
       ) {
-        console.log("delete page break");
         const indexEmpty = separatePage.findIndex((item) => item === "");
 
         if (indexEmpty < 1) return;
@@ -657,65 +464,17 @@ function shouldDeletePageBreak(content: string, page: number) {
 function handlePaste(event: any) {
   const clipboardData = event.clipboardData;
   const pastedText = clipboardData.getData("text/html");
+  // const pastedText = clipboardData.getData("text/plain");
   console.log("pastedText", pastedText);
 
   // Process the pasted text or apply custom logic
   // const transformedText = transformPastedText(pastedText);
-  // const transformedText = pastedText;
-  // test.value = pastedText;
+  const transformedText = pastedText;
+  test.value = pastedText;
   // editor.value?.commands.setContent(transformedText, true);
-  const docxHtml = `
-    <table style="border: none; border-collapse: collapse">
-      <colgroup>
-        <col width="734" />
-      </colgroup>
-      <tbody>
-        <tr style="height: 0pt">
-          <td
-            style="
-              border-bottom: solid #000000 0.5pt;
-              vertical-align: bottom;
-              padding: 0pt 5.4pt 0pt 5.4pt;
-              overflow: hidden;
-              overflow-wrap: break-word;
-            "
-          >
-            <br />
-          </td>
-        </tr>
-        <tr style="height: 0pt">
-          <td
-            style="
-              border-bottom: solid #000000 0.5pt;
-              border-top: solid #000000 0.5pt;
-              vertical-align: bottom;
-              padding: 0pt 5.4pt 0pt 5.4pt;
-              overflow: hidden;
-              overflow-wrap: break-word;
-            "
-          >
-            <br />
-          </td>
-        </tr>
-        <tr style="height: 0pt">
-          <td
-            style="
-              border-bottom: solid #000000 0.5pt;
-              border-top: solid #000000 0.5pt;
-              vertical-align: bottom;
-              padding: 0pt 5.4pt 0pt 5.4pt;
-              overflow: hidden;
-              overflow-wrap: break-word;
-            "
-          >
-            <br />
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  `;
 
-  editor.value?.commands.insertContent(docxHtml);
+  // editor.value?.commands.insertContent(transformedText);
+  editor.value?.chain().focus().insertContent(transformedText).run();
 }
 
 // function transformPastedText(text: string) {
