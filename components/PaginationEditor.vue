@@ -1,6 +1,7 @@
 <template>
+  <div v-html="test"></div>
   <div class="page--placeholder">
-    <editor-content :editor="editor" />
+    <editor-content :editor="editor" @paste.prevent="handlePaste" />
   </div>
 </template>
 
@@ -18,6 +19,7 @@ import { Node } from "@tiptap/core";
 import { PAGE_BREAK_FORMAT, PAPER_HEIGHT, SPARATOR_HEIGHT } from "~/constants";
 import { PAGE_BREAK_FORMAT_CHECK } from "~/constants";
 
+const test = ref();
 const PageBreak = Node.create({
   name: "pageBreak",
   addOptions() {
@@ -89,11 +91,11 @@ const textAlignment = [
 
 const defaultHeadingClass = "font-bold";
 const headingClass: Record<Level, string> = {
-  1: "text-7xl",
-  2: "text-6xl",
-  3: "text-5xl",
-  4: "text-4xl",
-  5: "text-2xl",
+  1: "text-3xl",
+  2: "text-2xl",
+  3: "text-xl",
+  4: "text-xl",
+  5: "text-xl",
   6: "text-xl",
 };
 
@@ -267,6 +269,24 @@ function isPageEmpty(content: string) {
     console.log({ cond, content, res: cond === content });
     return cond === content;
   });
+}
+
+function handlePaste(event: any) {
+  const clipboardData = event.clipboardData;
+  const pastedText = clipboardData.getData("text/html");
+  console.log("pastedText", pastedText);
+
+  // Process the pasted text or apply custom logic
+  // const transformedText = transformPastedText(pastedText);
+  const transformedText = pastedText;
+  test.value = pastedText;
+  // editor.value?.commands.setContent(transformedText);
+  // editor.value?.commands.insertContent(transformedText);
+}
+
+function transformPastedText(text: string) {
+  // Apply your custom transformations to the pasted text
+  return text.toUpperCase(); // Example: converting text to uppercase
 }
 </script>
 
