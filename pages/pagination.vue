@@ -6,7 +6,7 @@
     Upload
   </button>
 
-  <div v-if="result" v-html="result" class="border-2 mb-6 p-4"></div>
+  <!-- <div v-if="result" v-html="result" class="border-2 mb-6 p-4"></div> -->
   <div class="min-h-screen bg-slate-200 p-4">
     <div
       class="bg-white"
@@ -43,7 +43,9 @@ onChange((files) => {
         mammoth
           .convertToHtml({ arrayBuffer: arrayBuffer as ArrayBuffer })
           .then((res) => {
-            result.value = res.value;
+            // result.value = res.value;
+            console.log(res.value)
+            tiptap.value.editor.commands.setContent(res.value || "", true)
           });
       });
       //   fileDoc.value = file;

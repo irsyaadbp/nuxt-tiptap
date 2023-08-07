@@ -58,8 +58,8 @@ const PageBreak = Node.create({
 });
 
 function getValueStyle(element: any, name: string) {
-  const style: string[] = element.getAttribute("style").split(";");
-  const findName = style.find((item) => item.includes(name));
+  const style: string[] = element.getAttribute("style")?.split(";");
+  const findName = style?.find((item) => item.includes(name));
 
   return findName?.split(":")[1] || "";
 }
@@ -336,6 +336,7 @@ const editor = useEditor({
     Highlight,
     Image.configure({
       inline: true,
+      allowBase64: true,
     }),
     PageBreak,
     CustomTable.configure({
@@ -348,7 +349,7 @@ const editor = useEditor({
   ],
   onUpdate(props) {
     // HTML
-    console.log("update");
+    console.log("update", props.editor.getHTML());
     vModel.value = props.editor.getHTML();
   },
   onSelectionUpdate(event) {
@@ -495,5 +496,9 @@ function handlePaste(event: any) {
   @apply bg-slate-200;
   page-break-after: always;
   height: 24px;
+}
+
+img {
+  display: inline-block;
 }
 </style>
