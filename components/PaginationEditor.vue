@@ -57,7 +57,7 @@ const PageBreak = Node.create({
   },
 });
 
-function getValueStyle(element, name: string) {
+function getValueStyle(element: any, name: string) {
   const style: string[] = element.getAttribute("style").split(";");
   const findName = style.find((item) => item.includes(name));
 
@@ -392,55 +392,55 @@ defineExpose({
 //   6: "h6",
 // };
 
-watch(
-  vModel,
-  (newValue, oldValue) => {
-    const editorContainer = document.querySelector(
-      ".page--placeholder"
-    ) as HTMLDivElement;
+// watch(
+//   vModel,
+//   (newValue, oldValue) => {
+//     const editorContainer = document.querySelector(
+//       ".page--placeholder"
+//     ) as HTMLDivElement;
 
-    if (editorContainer) {
-      // const
-      const separatePage = (newValue as string).split(PAGE_BREAK_FORMAT_CHECK);
-      const currentPageCount = separatePage.length;
+//     if (editorContainer) {
+//       // const
+//       const separatePage = (newValue as string).split(PAGE_BREAK_FORMAT_CHECK);
+//       const currentPageCount = separatePage.length;
 
-      if (shouldAddPageBreak(currentPageCount, editorContainer)) {
-        newValue = (newValue || "").replace(/<p><\/p>(?![\s\S]*<p><\/p>)/, "");
-        newValue += PAGE_BREAK_FORMAT;
+//       if (shouldAddPageBreak(currentPageCount, editorContainer)) {
+//         newValue = (newValue || "").replace(/<p><\/p>(?![\s\S]*<p><\/p>)/, "");
+//         newValue += PAGE_BREAK_FORMAT;
 
-        editor.value?.commands.setContent(newValue || "", true);
-        return;
-      }
+//         editor.value?.commands.setContent(newValue || "", true);
+//         return;
+//       }
 
-      if (
-        shouldDeletePageBreak(
-          separatePage[currentPageCount - 1],
-          currentPageCount
-        )
-      ) {
-        const indexEmpty = separatePage.findIndex((item) => item === "");
+//       if (
+//         shouldDeletePageBreak(
+//           separatePage[currentPageCount - 1],
+//           currentPageCount
+//         )
+//       ) {
+//         const indexEmpty = separatePage.findIndex((item) => item === "");
 
-        if (indexEmpty < 1) return;
+//         if (indexEmpty < 1) return;
 
-        const _newValue = separatePage
-          .filter((_item, idx) => idx !== indexEmpty)
-          .join(PAGE_BREAK_FORMAT_CHECK);
+//         const _newValue = separatePage
+//           .filter((_item, idx) => idx !== indexEmpty)
+//           .join(PAGE_BREAK_FORMAT_CHECK);
 
-        if (
-          newValue?.includes(PAGE_BREAK_FORMAT) &&
-          separatePage[currentPageCount - 1] !== ""
-        )
-          return;
+//         if (
+//           newValue?.includes(PAGE_BREAK_FORMAT) &&
+//           separatePage[currentPageCount - 1] !== ""
+//         )
+//           return;
 
-        editor.value?.commands.setContent(_newValue || "", true);
-        nextTick(() => {
-          editor.value?.chain().focus("end");
-        });
-      }
-    }
-  },
-  { deep: true }
-);
+//         editor.value?.commands.setContent(_newValue || "", true);
+//         nextTick(() => {
+//           editor.value?.chain().focus("end");
+//         });
+//       }
+//     }
+//   },
+//   { deep: true }
+// );
 
 const shouldAddPageBreak = (
   currentPageCount: number,
