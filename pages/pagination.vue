@@ -28,6 +28,30 @@ const result = ref();
 
 const { files, open, reset, onChange } = useFileDialog();
 
+function transformElement(element) {
+  if (element.children) {
+    const children = (element.children || [])?.map(transformElement);
+    element = { ...element, children: children };
+  }
+
+  if (element.type === "paragraph") {
+    element = transformParagraph(element);
+  }
+
+  console.log({ element });
+
+  return element;
+}
+
+function transformParagraph(element) {
+  return {
+    ...element,
+    styleName:
+      element.styleName ||
+      `Paragraph${element.alignment ? ` ${element.alignment}` : ""}`,
+  };
+}
+
 onChange((files) => {
   /** do something with files */
 
@@ -41,11 +65,34 @@ onChange((files) => {
     ) {
       fileToByteArray(file).then((arrayBuffer) => {
         mammoth
-          .convertToHtml({ arrayBuffer: arrayBuffer as ArrayBuffer })
+          .convertToHtml(
+            { arrayBuffer: arrayBuffer as ArrayBuffer },
+            {
+              ignoreEmptyParagraphs: false,
+              transformDocument: transformElement,
+              styleMap: [
+                "p[style-name='Paragraph center'] => p.text-center",
+                "p[style-name='Paragraph left'] => p.text-left",
+                "p[style-name='Paragraph right'] => p.text-right",
+                "p[style-name='Paragraph justify'] => p.text-justify",
+              ],
+            }
+          )
           .then((res) => {
             // result.value = res.value;
-            console.log(res.value)
-            tiptap.value.editor.commands.setContent(res.value || "", true)
+
+            const replaceData = [
+              ['class="text-center"', 'style="text-align: center"'],
+              ['class="text-left"', 'style="text-align: left"'],
+              ['class="text-right"', 'style="text-align: right"'],
+              ['class="text-justify"', 'style="text-align: justify"'],
+            ];
+            let docsHtml = res.value;
+            replaceData.forEach(([rawValue, replaceValue]) => {
+              docsHtml = docsHtml.replaceAll(rawValue, replaceValue);
+            });
+
+            tiptap.value.editor.commands.setContent(docsHtml || "", true);
           });
       });
       //   fileDoc.value = file;
