@@ -31,14 +31,20 @@ const { files, open, reset, onChange } = useFileDialog();
 function transformElement(element) {
   if (element.children) {
     const children = (element.children || [])?.map(transformElement);
-    element = { ...element, children: children };
+    element = {
+      ...element,
+      children: children,
+      styleName: `${element.styleName || "Paragraph"}${
+        element.alignment ? ` ${element.alignment}` : ""
+      }`,
+    };
   }
 
-  if (element.type === "paragraph") {
-    element = transformParagraph(element);
-  }
+  // if (element.type === "paragraph") {
+  //   element = transformParagraph(element);
+  // }
 
-  console.log({ element });
+  // console.log({ element });
 
   return element;
 }
@@ -48,7 +54,9 @@ function transformParagraph(element) {
     ...element,
     styleName:
       element.styleName ||
-      `Paragraph${element.alignment ? ` ${element.alignment}` : ""}`,
+      `Paragraph${element.styleName}${
+        element.alignment ? ` ${element.alignment}` : ""
+      }`,
   };
 }
 
@@ -75,6 +83,14 @@ onChange((files) => {
                 "p[style-name='Paragraph left'] => p.text-left",
                 "p[style-name='Paragraph right'] => p.text-right",
                 "p[style-name='Paragraph justify'] => p.text-justify",
+                "p[style-name='heading 1 center'] => h1.text-center",
+                "p[style-name='heading 1 left'] => h1.text-left",
+                "p[style-name='heading 1 right'] => h1.text-right",
+                "p[style-name='heading 1 justify'] => h1.text-justify",
+                "p[style-name='heading 2 center'] => h2.text-center",
+                "p[style-name='heading 2 left'] => h2.text-left",
+                "p[style-name='heading 2 right'] => h2.text-right",
+                "p[style-name='heading 2 justify'] => h2.text-justify",
               ],
             }
           )
